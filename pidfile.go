@@ -1,13 +1,20 @@
 package pidfile
 
+// #include <stdlib.h>
 // #include <bsd/libutil.h>
 // #cgo LDFLAGS: -lbsd
 import "C"
 
+import (
+	"unsafe"
+)
+
 type PIDFile C.struct_pidfh
 
-func Open() (*PIDFile, error) {
-	p, e := C.pidfile_open(nil, 0600, nil)
+func Open(name string) (*PIDFile, error) {
+	name_cstr := C.CString(name)
+	p, e := C.pidfile_open(name_cstr, 0600, nil)
+	C.free(unsafe.Pointer(name_cstr))
 	return (*PIDFile)(p), e
 }
 
